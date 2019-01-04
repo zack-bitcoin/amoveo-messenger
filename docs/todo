@@ -1,0 +1,31 @@
+lookup account should display different info now.
+How many messages can this account send till it runs out of credits?
+
+change "amoveo-feed" to "amoveo-messenger" everywhere.
+
+add the encrypted_mail gen server
+
+add the channel_close_mail gen server
+
+an api for sending a message in encrypted mail.
+* costs a fee.
+
+an api for reading a message from encrypted mail.
+* continue storing the message until at least 60 minutes are up.
+
+an api for sending a message in channel_close_mail
+* must be a valid channel team close tx signed by 1 of the participants.
+* we only store one of these per account in each channel, so at most, we could store (number of channels)*2 of these at a time.
+* They are deleted after a couple weeks.
+* costs a fee.
+
+an api to read a channel_close_message.
+* anyone can read it. it will eventually go on-chain, so privacy is not an issue.
+* don't delete it, even if it has been read. save for 2 weeks, or until the channel gets closed.
+
+
+check if anything in config.erl is unused.
+
+check if anything in utils.erl is unused.
+
+test sending messages from javascript and paying using the Amoveo mainnet.

@@ -50,11 +50,6 @@ spend2(veo, To, Amount) ->
     talker:talk_helper(Msg, config:full_node(), 10),
     ok.
    
-total_received_bitcoin(Address) -> 
-    S = "https://blockchain.info/q/getreceivedbyaddress/",
-    S2 = S++binary_to_list(Address)++"?confirmations="++(integer_to_list(config:confirmations(bitcoin))),
-    {ok, {_, _, Result}} = httpc:request(S2),
-    list_to_integer(Result).
 off() ->
     amoveo_feed_sup:stop(),
     ok = application:stop(amoveo_feed),

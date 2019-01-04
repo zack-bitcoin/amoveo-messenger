@@ -18,32 +18,32 @@ handle(Req, State) ->
 doit({price}, _) ->
     {_, P} = posts:price(),
     {ok, P};
-doit({lookup, Start, Many}, _) ->
-    true = is_integer(Start),
-    true = is_integer(Many),
-    true = -1 < Start,
-    true = 0 < Many,
-    {ok, posts:lookup(Start, Many)};
-doit({post, SR}, _) ->
-    io:fwrite("submitting a post\n"),
+%doit({lookup, Start, Many}, _) ->
+%    true = is_integer(Start),
+%    true = is_integer(Many),
+%    true = -1 < Start,
+%    true = 0 < Many,
+%    {ok, posts:lookup(Start, Many)};
+%doit({post, SR}, _) ->
+%    io:fwrite("submitting a post\n"),
     %ok = trade_limit:doit(IP),
-    R = element(2, SR),
-    {30, Pubkey, Height, Text, ServerPubkey} = R,
-    ServerPubkey = base64:encode(utils:pubkey()),
-    true = is_integer(Height),
-    true = is_binary(Pubkey),
-    true = is_binary(Text),
-    true = size(Text) < config:max_post_size(),
-    65 = size(Pubkey),
-    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
-    true = NodeHeight < Height + 3,
-    true = NodeHeight > Height - 1,
-    Sig = element(3, SR),
-    true = sign:verify_sig(R, Sig, Pubkey),
-    true = accounts:nonce_below(Pubkey, Height),
-    {ID, Price} = posts:new(Text),
-    accounts:spend(Pubkey, Price, Height),
-    {ok, ID};
+%    R = element(2, SR),
+%    {30, Pubkey, Height, Text, ServerPubkey} = R,
+%    ServerPubkey = base64:encode(utils:pubkey()),
+%    true = is_integer(Height),
+%    true = is_binary(Pubkey),
+%    true = is_binary(Text),
+%    true = size(Text) < config:max_post_size(),
+%    65 = size(Pubkey),
+%    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
+%    true = NodeHeight < Height + 3,
+%    true = NodeHeight > Height - 1,
+%    Sig = element(3, SR),
+%    true = sign:verify_sig(R, Sig, Pubkey),
+%    true = accounts:nonce_below(Pubkey, Height),
+%    {ID, Price} = posts:new(Text),
+%    accounts:spend(Pubkey, Price, Height),
+%    {ok, ID};
 doit({test}, _) ->
     {ok, <<"success 2">>};
 doit({account, X}, _) ->
