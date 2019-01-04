@@ -1,0 +1,21 @@
+{application, amoveo_feed,
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { amoveo_feed_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+	ssl,
+	inets,
+	jiffy,
+	cowboy,
+	pink_hash
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
