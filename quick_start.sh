@@ -1,1 +1,1 @@
-./_build/prod/rel/amoveo_feed/bin/amoveo_messenger start
+./_build/prod/rel/amoveo_messenger/bin/amoveo_messenger start

@@ -49,6 +49,8 @@ spend2(veo, To, Amount) ->
     Msg = {spend, To, Amount},
     talker:talk_helper(Msg, config:full_node(), 10),
     ok.
+valid_address(B) ->
+    true = size(B) == 65.
    
 off() ->
     amoveo_messenger_sup:stop(),

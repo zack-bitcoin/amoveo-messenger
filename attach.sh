@@ -1,1 +1,1 @@
-./_build/prod/rel/amoveo_feed/bin/amoveo_feed attach
+./_build/prod/rel/amoveo_messenger/bin/amoveo_messenger attach

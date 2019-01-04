@@ -1,8 +1,6 @@
 lookup account should display different info now.
 How many messages can this account send till it runs out of credits?
 
-add the encrypted_mail gen server
-
 add the channel_close_mail gen server
 
 an api for sending a message in encrypted mail.
@@ -21,9 +19,19 @@ an api to read a channel_close_message.
 * anyone can read it. it will eventually go on-chain, so privacy is not an issue.
 * don't delete it, even if it has been read. save for 2 weeks, or until the channel gets closed.
 
+Make a process to clean old messages out of encrypted mail periodically,
+Make a process to clean old messages out of channel close mail periodically,
+
+size limit for messages being sent in encrypted_mail or channel_close_mail.
+
 
 check if anything in config.erl is unused.
 
 check if anything in utils.erl is unused.
 
 test sending messages from javascript and paying using the Amoveo mainnet.
+
+
+
+
+The first version used ram to store messages, since these messages are read so infrequently, it would be a nice upgrade to store it on the hard drive.
