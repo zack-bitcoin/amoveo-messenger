@@ -51,8 +51,8 @@ spend2(veo, To, Amount) ->
     ok.
    
 off() ->
-    amoveo_feed_sup:stop(),
-    ok = application:stop(amoveo_feed),
+    amoveo_messenger_sup:stop(),
+    ok = application:stop(amoveo_messenger),
     ok.
     
 

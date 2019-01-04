@@ -1,8 +1,6 @@
 lookup account should display different info now.
 How many messages can this account send till it runs out of credits?
 
-change "amoveo-feed" to "amoveo-messenger" everywhere.
-
 add the encrypted_mail gen server
 
 add the channel_close_mail gen server
