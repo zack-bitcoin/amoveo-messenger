@@ -2,7 +2,7 @@
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 new/2, read/1, clean/0, test/0]).
--record(msg, {time, data}).
+-record(msg, {time, data, to}).
 -define(limit, 3600000000).%one hour is 60*60*1000000 microseconds
 -define(LOC, "encrypted_mail.db").
 init(ok) -> 

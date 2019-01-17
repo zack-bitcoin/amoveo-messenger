@@ -2,9 +2,9 @@ lookup account should display different info now.
 How many messages can this account send till it runs out of credits?
 
 add the channel_close_mail gen server
-* verify that a channel is live before storing a close_tx
-* instead of storing by account, we should store by CID. store up to 2 txs per CID, one for each participant.
+* verify that the correct person signed the tx before storing
 * update clean_accounts to check if any channel is closed, and remove close_channel_txs for that channel from the database
+* run a test
 
 an api for sending a message in encrypted mail.
 * costs a fee.

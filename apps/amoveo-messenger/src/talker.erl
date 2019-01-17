@@ -1,10 +1,15 @@
 -module(talker).
--export([talk_helper/3, talk/1]).
+-export([talk_helper/3, talk/1, ext_talk/1]).
 
 talk(Data) ->
     FN = config:full_node(),
     X = talk_helper(Data, FN, 2),
     packer:unpack(X).
+ext_talk(Data) ->
+    FN = config:external_full_node(),
+    X = talker:talk_helper(Data, FN, 2)),
+    packer:unpack(X).
+    
 
 talk_helper2(Data, Peer) ->
     D2 = iolist_to_binary(packer:pack(Data)),
