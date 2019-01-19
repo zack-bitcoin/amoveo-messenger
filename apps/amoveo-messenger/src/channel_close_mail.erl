@@ -45,13 +45,13 @@ new(Stx, To) ->
     Acc1 = Tx#ctc.aid1,
     Acc2 = Tx#ctc.aid2,
     CID = Tx#ctc.id,
-    {ok, From} = case To of %verifies that To is the opposite of whoever has already signed the tx, and that the signature is valid.
+    From = case To of %verifies that To is the opposite of whoever has already signed the tx, and that the signature is valid.
                Acc1 -> sign:verify_sig(Tx, Stx#signed.sig2, Acc2),
                        Acc2;
                Acc2 -> sign:verify_sig(Tx, Stx#signed.sig, Acc1),
                        Acc1;
-            _ -> error
-        end,
+               _ -> error
+           end,
     true = utils:valid_address(To),
     live = channel_state(CID),
     gen_server:cast(?MODULE, {new, Stx, To}),

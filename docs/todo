@@ -1,4 +1,6 @@
-we need to update the withdrawl feature to use nonces instead of heights
+
+jMake a process to clean old messages out of encrypted mail periodically,
+Make a process to clean old messages out of channel close mail periodically,
 
 lookup account should display different info now.
 How many messages can this account send till it runs out of credits?
@@ -8,9 +10,6 @@ unit tests for the channel_close_mail gen server
 need to test accounts:nonce_increment.
 
 need integration tests for sending encrypted messages and channel_close_tx messages, and receiving both.
-
-Make a process to clean old messages out of encrypted mail periodically,
-Make a process to clean old messages out of channel close mail periodically,
 
 size limit for messages being sent in encrypted_mail or channel_close_mail.
 
