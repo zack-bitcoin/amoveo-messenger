@@ -52,21 +52,43 @@ doit({account, X}, _) ->
 	error -> {ok, 0}
     end;
 doit({height}, _) ->
-    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
-    {ok, NodeHeight};
-doit({pubkey}, _) ->
-    {ok, NodePub} = packer:unpack(talker:talk_helper({pubkey}, config:full_node(), 10)),
-    {ok, NodePub};
+    talker:talk({height});
+doit({pubkey}, _) -> talker:talk({pubkey});
 doit({spend, SR}, _) ->
+    %this withdraws your entire balance from the account.
     R = element(2, SR),
-    {28, Pubkey, Height} = R,
-    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
-    true = NodeHeight < Height + 3,
-    true = NodeHeight > Height - 1,
+    {53410, Pubkey, Nonce} = R,
     Sig = element(3, SR),
     true = sign:verify_sig(R, Sig, Pubkey),
+    true = accounts:nonce_increment(Nonce),
     accounts:withdrawal(Pubkey),
     {ok, 0};
+doit({send, 0, To, SR}, _) -> %for encrypted messages
+    {signed, {53412, From, Nonce, Emsg}, Sig, _} = SR,
+    R = element(2, SR),
+    true = sign:verify_sig(R, Sig, From),
+    true = accounts:nonce_increment(From, Nonce),
+    Price = config:encrypted_message_fee(),
+    {ok, Height} = talker:talk({height}),
+    accounts:spend(From, Price, Height),%charge a fee
+    encrypted_mail:new(Emsg, To),
+    {ok, 0};
+doit({read, 0, To}, _) ->
+    X = encrypted_mail:read(To),
+    {ok, X};
+doit({send, 1, To, SR}, _) -> %for channel-close-tx messages
+    {signed, {53411, From, Nonce, Stx}, Sig, _} = SR,
+    R = element(2, SR),
+    true = sign:verify_sig(R, Sig, From),
+    true = accounts:nonce_increment(From, Nonce),
+    {ok, Height} = talker:talk({height}),
+    Price = config:channel_close_message_fee(),
+    accounts:spend(From, Price, Height),%charge a fee
+    From = channel_close_mail:new(Stx, To),
+    {ok, 0};
+doit({read, 1, To}, _) ->
+    X = channel_close_mail:read(To),
+    {ok, X};
 doit(X, _) ->
     io:fwrite("http handler cannot handle this "),
     io:fwrite(packer:pack(X)),

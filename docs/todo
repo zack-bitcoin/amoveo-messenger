@@ -1,26 +1,13 @@
+we need to update the withdrawl feature to use nonces instead of heights
+
 lookup account should display different info now.
 How many messages can this account send till it runs out of credits?
 
-add the channel_close_mail gen server
-* verify that the correct person signed the tx before storing
-* update clean_accounts to check if any channel is closed, and remove close_channel_txs for that channel from the database
-* run a test
+unit tests for the channel_close_mail gen server
 
-an api for sending a message in encrypted mail.
-* costs a fee.
+need to test accounts:nonce_increment.
 
-an api for reading a message from encrypted mail.
-* continue storing the message until at least 60 minutes are up.
-
-an api for sending a message in channel_close_mail
-* must be a valid channel team close tx signed by 1 of the participants.
-* we only store one of these per account in each channel, so at most, we could store (number of channels)*2 of these at a time.
-* They are deleted after a couple weeks.
-* costs a fee.
-
-an api to read a channel_close_message.
-* anyone can read it. it will eventually go on-chain, so privacy is not an issue.
-* don't delete it, even if it has been read. save for 2 weeks, or until the channel gets closed.
+need integration tests for sending encrypted messages and channel_close_tx messages, and receiving both.
 
 Make a process to clean old messages out of encrypted mail periodically,
 Make a process to clean old messages out of channel close mail periodically,
@@ -38,3 +25,5 @@ test sending messages from javascript and paying using the Amoveo mainnet.
 
 
 The first version used ram to store messages, since these messages are read so infrequently, it would be a nice upgrade to store it on the hard drive.
+
+the javascript for spend needs to change, since we use nonces now.

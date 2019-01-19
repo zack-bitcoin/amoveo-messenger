@@ -1,8 +1,11 @@
 -module(channel_close_mail).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-new/3, read/1, clean/0, test/0]).
--record(msg, {time, data, to}).
+new/2, read/1, clean/0, test/0]).
+-record(msg, {time, data, to, cid}).
+-record(ctc, {aid1 = 0, aid2 = 0, fee = 0,
+	      nonce = 0, id = 0, amount = 0}).
+-record(signed, {data="", sig="", sig2=""}).
 -define(limit, 1209600000000).%two weeks is 14*24*60*60*1000000 microseconds
 -define(LOC, "encrypted_mail.db").
 init(ok) -> 
@@ -18,10 +21,9 @@ handle_cast(clean, X) ->
     X2 = clean_helper(X),
     {noreply, X2};
 handle_cast({new, Stx, To}, X) -> 
-    %Tx = element(2, Msg),
-    %Tx = Msg#msg.data,
-    %CID = Tx#ctc.id,
-    NM = #msg{time = erlang:timestamp(), data = Stx, to = To},
+    Tx = signed:data(Stx),
+    CID = Tx#ctc.id,
+    NM = #msg{time = erlang:timestamp(), data = Stx, to = To, cid = CID},
     L2 = case dict:find(CID, X) of
              error -> [NM];
              {ok, L} -> max2(L, NM)
@@ -40,27 +42,24 @@ handle_call(_, _From, X) -> {reply, X, X}.
 clean() -> gen_server:cast(?MODULE, clean).
 new(Stx, To) -> 
     Tx = signed:data(Stx),
-    CID = element(6, Tx),
-    ok = case To of
-            Acc1 -> ok;
-            Acc2 -> ok;
+    Acc1 = Tx#ctc.aid1,
+    Acc2 = Tx#ctc.aid2,
+    CID = Tx#ctc.id,
+    {ok, From} = case To of %verifies that To is the opposite of whoever has already signed the tx, and that the signature is valid.
+               Acc1 -> sign:verify_sig(Tx, Stx#signed.sig2, Acc2),
+                       Acc2;
+               Acc2 -> sign:verify_sig(Tx, Stx#signed.sig, Acc1),
+                       Acc1;
             _ -> error
         end,
     true = utils:valid_address(To),
-    {ok, N} = talker:talk({height}),
-    {ok, Header} = talker:ext_talk({header, N}),
-    Hash = element(3, Header),
-    {ok, X} = talker:ext_talk({proof, <<"channels">>, CID, Hash}),
-    Channel = element(4, X),
-    CS = element(11, Channel),
-    CS = 0,%verifies that the channel is live
-    %make sure that To is the opposite of whoever has already signed the tx.
-    %make sure that the signature is valid
-    gen_server:cast(?MODULE, {new, STx, To}).
+    live = channel_state(CID),
+    gen_server:cast(?MODULE, {new, Stx, To}),
+    From.
+    
 read(To) -> 
     true = utils:valid_address(To),
     gen_server:call(?MODULE, {read, To}).
-
 clean_helper(X) ->
     Keys = dict:fetch_keys(X),
     clean_accounts(Keys, X).
@@ -73,12 +72,15 @@ clean_accounts([H|T], X) ->
 clean_msgs([]) -> [];%loop over each message to this account
 clean_msgs([H|T]) ->
     ND = timer:now_diff(erlang:timestamp(), H#msg.time),
-    %check if the channel is already closed, if it is, delete it.
-    H2 = if
-             ND > ?limit -> [];
-             true -> [H]
-         end,
-    H2 ++ clean_msgs(T).
+    if
+        ND > ?limit -> clean_msgs(T);
+        true ->
+            CS = channel_state(H#msg.cid),
+            case CS of
+                closed -> clean_msgs(T); %check if the channel is already closed, if it is, delete it.
+                open -> [H|clean_msgs(T)]
+            end
+    end.
 get_data([]) -> [];
 get_data([H|T]) ->
     M = H#msg.data,
@@ -97,10 +99,21 @@ max2([A|B], X) ->
         ATO -> [X|B];
         BTO -> [X|A]
     end.
-
+channel_state(CID) ->%needs to be updated not to crash on non-existant channels.
+    {ok, N} = talker:talk({height}),
+    {ok, Header} = talker:ext_talk({header, N}),
+    Hash = element(3, Header),
+    {ok, X} = talker:ext_talk({proof, <<"channels">>, CID, Hash}),
+    Channel = element(4, X),
+    case element(11, Channel) of
+        0 -> live;
+        1 -> closed
+    end.
+    
+           
 test() ->
     To = base64:decode("BOuze97rZS1nHwZEEUNZJZmPaILyAViRLMPSVi24EIH1T4fG+fHVDg0eVmhCCprjy+aUhXAQafyR2Rx5Rwt4I08="),
     Msg = <<"abcdef">>,
     CID = base64:decode("vVhSBIjO7fU0V4v08WH2O2crgjtl9wTODuIk+jeB2NM="),
-    new(Msg, To, CID),
+    new(Msg, To),
     read(To).

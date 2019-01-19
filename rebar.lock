@@ -8,7 +8,7 @@
   1},
  {<<"encrypter">>,
   {git,"https://github.com/zack-bitcoin/encrypter",
-       {ref,"cf865022fde3a94f855b61bb2b0736156d4134a8"}},
+       {ref,"d157442ade6a9acc142bf61d74366a1819552cd9"}},
   1},
  {<<"jiffy">>,
   {git,"https://github.com/davisp/jiffy",

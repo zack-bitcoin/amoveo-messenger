@@ -7,7 +7,7 @@ talk(Data) ->
     packer:unpack(X).
 ext_talk(Data) ->
     FN = config:external_full_node(),
-    X = talker:talk_helper(Data, FN, 2)),
+    X = talker:talk_helper(Data, FN, 2),
     packer:unpack(X).
     
 
