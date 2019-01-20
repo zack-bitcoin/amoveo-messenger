@@ -39,9 +39,9 @@ handle_cast({update, NewHeight}, X) ->
 	NewHeight > H ->
 		 M = {pubkey, Pubkey, NewHeight - H, NewHeight},%amoveo_utils:address_history
 		 {ok, Txs} = talker:talk(M),
-		 io:fwrite("txs "),
-		 io:fwrite(packer:pack(Txs)),
-		 io:fwrite("\n"),
+		 %io:fwrite("txs "),
+		 %io:fwrite(packer:pack(Txs)),
+		 %io:fwrite("\n"),
 		 A2 = receive_payments(Txs, X#d.accounts, Pubkey),
 		 X#d{height = NewHeight, accounts = A2};
 	true -> X
