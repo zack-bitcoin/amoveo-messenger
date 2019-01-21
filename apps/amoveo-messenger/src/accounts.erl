@@ -2,7 +2,7 @@
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	cron/0,get/1,withdrawal/1,spend/3,height_below/2,
-        nonce_increment/1]).
+        nonce_increment/2, give_credits/2]).
 -record(d, {height, accounts}).
 -record(acc, {veo = 0, height = 0, nonce = 0}).
 -define(LOC, "accounts.db").
@@ -63,6 +63,16 @@ handle_cast({spend, Pub, Amount, Height}, X) ->
 		end
 	end,
     {noreply, X2};
+handle_cast({give_credits, Pub, Amount}, X) ->
+    Accs = X#d.accounts,
+    A2 = case dict:find(Pub, Accs) of
+             error -> #acc{veo = Amount};
+             {ok, A} ->
+                 A#acc{veo = A#acc.veo + Amount}
+         end,
+    Accs2 = dict:store(Pub, A2, Accs),
+    X2 = X#d{accounts = Accs2},
+    {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
 handle_call({get, Pub}, _From, X) -> 
     Accs = X#d.accounts,
@@ -70,7 +80,7 @@ handle_call({get, Pub}, _From, X) ->
     {reply, Y, X};
 handle_call({nonce_increment, Pub, N}, _From, X) ->
     Accs = X#d.accounts,
-    A = dict:find(Pub, Accs),
+    {ok, A} = dict:find(Pub, Accs),
     ON = A#acc.nonce,
     if
         N > ON -> 
@@ -90,11 +100,19 @@ update() ->
 		  Height = utils:height(veo),
 		  gen_server:cast(?MODULE, {update, Height})
 	  end).
-get(Pub) -> gen_server:call(?MODULE, {get, Pub}).
-nonce_increment(Nonce) -> 
+get(Pub) -> 
+    65 = size(Pub),
+    gen_server:call(?MODULE, {get, Pub}).
+nonce_increment(Pub, Nonce) -> 
+    65 = size(Pub),
     true = is_integer(Nonce),
     true = Nonce > -1,
-    gen_server:call(?MODULE, {nonce_increment, Nonce}).
+    gen_server:call(?MODULE, {nonce_increment, Pub, Nonce}).
+give_credits(Pub, Amount) ->
+    65 = size(Pub),
+    true = is_integer(Amount),
+    true = Amount > -1,
+    gen_server:cast(?MODULE, {give_credits, Pub, Amount}).
     
 receive_payments([], X, _) -> X;
 receive_payments([{_, Tx}|T], X, Pubkey) ->
