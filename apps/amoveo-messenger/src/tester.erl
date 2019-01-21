@@ -12,6 +12,6 @@ test() ->
     R = {53412, base64:decode(From), Nonce, Emsg},
     Sig = sign:sign(R, base64:decode(Priv)),
     true = sign:verify_sig(R, Sig, base64:decode(From)),
-    http_handler:doit({send, 0, To, {signed, R, Sig, []}}, 0),%breaks here
-    {ok, [<<"test">>]} = http_handler:doit({read, 0, To}, 0),
+    http_handler:doit({send, 0, To, {signed, R, Sig, []}}, 0),
+    {ok, [Emsg]} = http_handler:doit({read, 0, To}, 0),
     success.
