@@ -66,7 +66,10 @@ doit({spend, SR}, _) ->
 doit({send, 0, To, SR}, _) -> %for encrypted messages
     {signed, {53412, From, Nonce, Emsg}, Sig, _} = SR,
     R = element(2, SR),
-    true = sign:verify_sig(R, Sig, From),
+    %io:fwrite("http handler send 0 \n"),
+    %io:fwrite(packer:pack(R)),
+    %io:fwrite("\n"),
+    true = sign:verify_sig(R, Sig, From),%here
     true = accounts:nonce_increment(From, Nonce),
     Price = config:encrypted_message_fee(),
     {ok, Height} = talker:talk({height}),
