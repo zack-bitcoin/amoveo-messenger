@@ -1,7 +1,7 @@
 -module(channel_close_mail).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-new/2, read/1, clean/0, test/0]).
+new/2, read/2, clean/0, test/0]).
 -record(msg, {time, data, to, cid}).
 -record(ctc, {aid1 = 0, aid2 = 0, fee = 0,
 	      nonce = 0, id = 0, amount = 0}).
@@ -36,8 +36,8 @@ handle_call({read, CID, To}, _From, X) ->
             error -> [];
             {ok, A} -> get_data(A)
         end,
-    {reply, Y, X};
-handle_call(_, _From, X) -> {reply, X, X}.
+    {reply, Y, X}.
+%handle_call(_, _From, X) -> {reply, X, X}.
 
 clean() -> gen_server:cast(?MODULE, clean).
 new(Stx, To) -> 
@@ -57,9 +57,9 @@ new(Stx, To) ->
     gen_server:cast(?MODULE, {new, Stx, To}),
     From.
     
-read(To) -> 
-    true = utils:valid_address(To),
-    gen_server:call(?MODULE, {read, To}).
+read(CID, To) -> 
+    %true = utils:valid_address(To),
+    gen_server:call(?MODULE, {read, CID, To}).
 clean_helper(X) ->
     Keys = dict:fetch_keys(X),
     clean_accounts(Keys, X).
@@ -116,4 +116,4 @@ test() ->
     Msg = <<"abcdef">>,
     CID = base64:decode("vVhSBIjO7fU0V4v08WH2O2crgjtl9wTODuIk+jeB2NM="),
     new(Msg, To),
-    read(To).
+    read(CID, To).

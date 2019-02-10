@@ -5,6 +5,7 @@ start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
     accounts:cron(),
+    encrypted_mail:cron(),
     amoveo_messenger_sup:start_link().
 stop(_State) ->
     ok.

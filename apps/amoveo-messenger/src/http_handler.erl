@@ -89,8 +89,8 @@ doit({send, 1, To, SR}, _) -> %for channel-close-tx messages
     accounts:spend(From, Price, Height),%charge a fee
     From = channel_close_mail:new(Stx, To),
     {ok, 0};
-doit({read, 1, To}, _) ->
-    X = channel_close_mail:read(To),
+doit({read, 1, CID, To}, _) ->
+    X = channel_close_mail:read(CID, To),
     {ok, X};
 doit(X, _) ->
     io:fwrite("http handler cannot handle this "),

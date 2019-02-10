@@ -1,9 +1,10 @@
 -module(encrypted_mail).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
+cron/0,
 new/2, read/1, clean/0, test/0]).
 -record(msg, {time, data, to}).
--define(limit, 3600000000).%one hour is 60*60*1000000 microseconds
+-define(limit, 7200000000).%two hours is 2*60*60*1000000 microseconds
 -define(LOC, "encrypted_mail.db").
 init(ok) -> 
     process_flag(trap_exit, true),
@@ -35,6 +36,12 @@ handle_call({read, To}, _From, X) ->
 handle_call(_, _From, X) -> {reply, X, X}.
 
 clean() -> gen_server:cast(?MODULE, clean).
+cron() ->
+    spawn(fun() -> cron2() end).
+cron2() ->
+    timer:sleep(300000),
+    clean(),
+    cron2().
 new(Msg, To) -> 
     true = utils:valid_address(To),
     gen_server:cast(?MODULE, {new, Msg, To}).
@@ -49,7 +56,7 @@ clean_accounts([], X) -> X;%loop over each account in dict
 clean_accounts([H|T], X) ->
     A = dict:fetch(H, X),
     A2 = clean_msgs(A),
-    X2 = dict:store(A2, X),
+    X2 = dict:store(H, A2, X),
     clean_accounts(T, X2).
 clean_msgs([]) -> [];%loop over each message to this account
 clean_msgs([H|T]) ->
