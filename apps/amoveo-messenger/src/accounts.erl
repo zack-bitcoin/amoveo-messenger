@@ -10,7 +10,7 @@ init(ok) ->
     process_flag(trap_exit, true),
     H = case config:mode() of
 	    test -> 0;
-	    production -> utils:height(veo)
+	    _ -> utils:height(veo)
 	end,
     R = #d{accounts = dict:new(), height = H},
     utils:init(R, ?LOC).
