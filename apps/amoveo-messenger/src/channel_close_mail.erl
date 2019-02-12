@@ -21,7 +21,8 @@ handle_cast(clean, X) ->
     X2 = clean_helper(X),
     {noreply, X2};
 handle_cast({new, Stx, To}, X) -> 
-    Tx = signed:data(Stx),
+    %Tx = signed:data(Stx),
+    Tx = Stx#signed.data,
     CID = Tx#ctc.id,
     NM = #msg{time = erlang:timestamp(), data = Stx, to = To, cid = CID},
     L2 = case dict:find(CID, X) of
@@ -41,7 +42,11 @@ handle_call({read, CID, To}, _From, X) ->
 
 clean() -> gen_server:cast(?MODULE, clean).
 new(Stx, To) -> 
-    Tx = signed:data(Stx),
+    %Tx = signed:data(Stx),
+    %Tx = element(2, Stx),
+    io:fwrite(packer:pack(Stx)),
+    io:fwrite("\n"),
+    Tx = Stx#signed.data,
     Acc1 = Tx#ctc.aid1,
     Acc2 = Tx#ctc.aid2,
     CID = Tx#ctc.id,

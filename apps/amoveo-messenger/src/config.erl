@@ -2,7 +2,8 @@
 -compile(export_all).
 
 %mode() -> test.
-mode() -> production.
+mode() -> testnet.
+%mode() -> production.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
 trade_frequency() -> 0.2.%this is how often each ip address can put trades into the order book.
 market_data_frequency() -> 3.%this is how often each ip address can look up the open orders from the order book.
@@ -10,6 +11,7 @@ confirmations(veo) -> %this is how many confirmations we wait after a tx is incl
     TM = mode(),
     case TM of
 	test -> 1;
+	testnet -> 4;
 	_ -> 4
     end;
 confirmations(bitcoin) -> 3.
@@ -22,12 +24,14 @@ external_full_node() ->
     TM = mode(),
     case TM of
 	test -> "http://localhost:3010/";
+	testnet -> "http://localhost:8070/";
 	_ -> "http://localhost:8080/"
     end.
 full_node() -> 
     TM = mode(),
     case TM of
 	test -> "http://localhost:3011/";
+	testnet -> "http://localhost:8071/";
 	_ -> "http://localhost:8081/"
     end.
 id_lookup_file() -> "id_lookup.db".
@@ -39,7 +43,7 @@ order_book_stale_period() ->
 min_trade_time() ->%in seconds
     case mode() of
 	test -> 0;
-	production -> 60*60
+	_ -> 60*60
     end.
 max_trade_time() ->
     12*60*60.%in seconds
@@ -56,7 +60,7 @@ trade_fee_refund() ->
 trades_cron_period() ->
     case mode() of
 	test -> 3000;
-	production -> 40000%40 seconds
+	_ -> 40000%40 seconds
     end.
 max_post_size() ->
     %in bytes
