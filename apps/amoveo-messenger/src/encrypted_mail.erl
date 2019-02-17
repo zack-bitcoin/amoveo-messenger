@@ -51,6 +51,8 @@ read(To) ->
 
 clean_helper(X) ->
     Keys = dict:fetch_keys(X),
+    io:fwrite(packer:pack(Keys)),
+    io:fwrite("\n"),
     clean_accounts(Keys, X).
 clean_accounts([], X) -> X;%loop over each account in dict
 clean_accounts([H|T], X) ->
@@ -74,4 +76,5 @@ test() ->
     To = base64:decode("BOuze97rZS1nHwZEEUNZJZmPaILyAViRLMPSVi24EIH1T4fG+fHVDg0eVmhCCprjy+aUhXAQafyR2Rx5Rwt4I08="),
     Msg = <<"abcdef">>,
     new(Msg, To),
-    read(To).
+    read(To),
+    clean().

@@ -51,7 +51,7 @@ new(Stx, To) ->
     Acc2 = Tx#ctc.aid2,
     CID = Tx#ctc.id,
     From = case To of %verifies that To is the opposite of whoever has already signed the tx, and that the signature is valid.
-               Acc1 -> sign:verify_sig(Tx, Stx#signed.sig2, Acc2),
+               Acc1 -> sign:verify_sig(Tx, Stx#signed.sig, Acc2),
                        Acc2;
                Acc2 -> sign:verify_sig(Tx, Stx#signed.sig, Acc1),
                        Acc1;
