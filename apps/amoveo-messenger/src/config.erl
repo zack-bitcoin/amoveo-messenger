@@ -11,8 +11,8 @@ confirmations(veo) -> %this is how many confirmations we wait after a tx is incl
     TM = mode(),
     case TM of
 	test -> 1;
-	testnet -> 4;
-	_ -> 4
+	testnet -> 1;
+	_ -> 1
     end;
 confirmations(bitcoin) -> 3.
 sync_block_period(veo) -> 40000.%in miliseconds.
