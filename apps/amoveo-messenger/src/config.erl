@@ -10,9 +10,9 @@ market_data_frequency() -> 3.%this is how often each ip address can look up the 
 confirmations(veo) -> %this is how many confirmations we wait after a tx is included in a block until we accept the payment as spent.
     TM = mode(),
     case TM of
-	test -> 1;
-	testnet -> 1;
-	_ -> 1
+	test -> 0;
+	testnet -> 0;
+	_ -> 0
     end;
 confirmations(bitcoin) -> 3.
 sync_block_period(veo) -> 40000.%in miliseconds.
